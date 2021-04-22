@@ -28,8 +28,19 @@ searchInp.addEventListener('keydown', async(e)=>{
     if (e.keyCode===13){
         let weather=await getWeatherByCityName(searchInp.value)
 
+        updateCurrentWeather(weather)
         console.log(weather)
     }
 })
 
+let updateCurrentWeather=(data)=>{
 
+    city.textContent=data.name + ', ' + data.sys.country;
+    day.textContent=dayOfWeek()
+   
+}
+
+let dayOfWeek=()=>{
+
+    return new Date().toLocaleDateString('en-EN', {'weekday': 'long'})
+}
