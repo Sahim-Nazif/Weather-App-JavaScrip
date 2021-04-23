@@ -6,7 +6,7 @@ let wind=document.querySelector('.weather_indicator-wind>.value')
 let pressure=document.querySelector('.weather_indicator-pressure>.value')
 let image=document.querySelector('.weather_image')
 let temprature=document.querySelector('.weather_temprature')
-
+let forecastBlock= document.querySelector('.weather_forecast')
 
 let weatherAPIKey='d4c3a8aefba09b7cf93c189487b1d070';
 let forecastBaseEndpoint='https://api.openweathermap.org/data/2.5/forecast?units=metric&appid=' + weatherAPIKey;
@@ -31,7 +31,17 @@ const getForecatByCityID=async(id)=>{
     let result= await fetch (endPoint)
     let forecast= await result.json();
 
-    console.log(forecast)
+    let forecastList=forecast.list;
+    let daily=[];
+    forecastList.forEach(day=>{
+        let date= new Date(day.dt_txt.replace(' ', 'T'));
+        let hours=date.getHours();
+        if (hours===12){
+            daily.push(day)
+        }
+    })
+
+    console.log(daily)
 }
 searchInp.addEventListener('keydown', async(e)=>{
     //13 is the key enter key code
@@ -68,8 +78,19 @@ const updateCurrentWeather=(data)=>{
    
 }
 
-const dayOfWeek=()=>{
+const updateForecast=(forecast)=>{
 
-    return new Date().toLocaleDateString('en-EN', {'weekday': 'long'})
+    forecastBlock.innerHTML='';
+    forecast.forEach(day=>{
+
+        let iconUrl='http://openweathermap.org/img/wn/' + day.weather[0].icon + '2x.png'
+        let day= dayOfWeek(day.dt * 1000);
+        
+    })
+}
+
+const dayOfWeek=(dt= new Date().getTime())=>{
+
+    return new Date(dt).toLocaleDateString('en-EN', {'weekday': 'long'})
 }
 
