@@ -51,11 +51,22 @@ let weatherImages=[
         ids:[200,201,202,210,211,212,221,230,231,232]
     }
 ]
-const getWeatherByCityName = async (city) => {
+const getWeatherByCityName = async (cityString) => {
 
+    let city;
+    if(cityString.includes(',')){
+        city=cityString.substring(0, cityString.indexOf(',')) 
+            + cityString.substring(cityString.lastIndexOf(','))
+    } else{
+        city=cityString;
+    }
     let endPoint = weatherBaseEndPoint + '&q=' + city;
 
     let response = await fetch(endPoint)
+    if (response.status !== 200){
+        alert('City not found !')
+        return ;
+    }
     let weather = await response.json();
 
     return weather;
@@ -84,7 +95,10 @@ const getForecatByCityID = async (id) => {
 searchInp.addEventListener('keydown', async (e) => {
     //13 is the key enter key code
     if (e.keyCode === 13) {
-        let weather = await getWeatherByCityName(searchInp.value)
+        let weather = await getWeatherByCityName(searchInp.value);
+        if (!weather){
+            return;
+        }
         let cityID = weather.id
         updateCurrentWeather(weather)
         let forecast= await getForecatByCityID(cityID)
