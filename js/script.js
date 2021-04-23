@@ -1,96 +1,146 @@
-let searchInp=document.querySelector('.weather_search')
-let city= document.querySelector('.weather_city');
-let day= document.querySelector('.weather_day')
-let humidity=document.querySelector('.weather_indicator-humidity>.value')
-let wind=document.querySelector('.weather_indicator-wind>.value')
-let pressure=document.querySelector('.weather_indicator-pressure>.value')
-let image=document.querySelector('.weather_image')
-let temprature=document.querySelector('.weather_temprature')
-let forecastBlock= document.querySelector('.weather_forecast')
+let searchInp = document.querySelector('.weather_search')
+let city = document.querySelector('.weather_city');
+let day = document.querySelector('.weather_day')
+let humidity = document.querySelector('.weather_indicator-humidity>.value')
+let wind = document.querySelector('.weather_indicator-wind>.value')
+let pressure = document.querySelector('.weather_indicator-pressure>.value')
+let image = document.querySelector('.weather_image')
+let temprature = document.querySelector('.weather_temprature')
+let forecastBlock = document.querySelector('.weather_forecast')
 
-let weatherAPIKey='d4c3a8aefba09b7cf93c189487b1d070';
-let forecastBaseEndpoint='https://api.openweathermap.org/data/2.5/forecast?units=metric&appid=' + weatherAPIKey;
-let weatherBaseEndPoint='https://api.openweathermap.org/data/2.5/weather?units=metric&appid=' + weatherAPIKey;
+let weatherAPIKey = 'd4c3a8aefba09b7cf93c189487b1d070';
+let forecastBaseEndpoint = 'https://api.openweathermap.org/data/2.5/forecast?units=metric&appid=' + weatherAPIKey;
+let weatherBaseEndPoint = 'https://api.openweathermap.org/data/2.5/weather?units=metric&appid=' + weatherAPIKey;
 
+let weatherImages=[
+    {
+        url:'images/clear-sky.png',
+        ids:[800]
+    },
+    {
+        url:'images/broken-clouds.png',
+        ids:[803,804]
+    },
+    {
+        url:'images/few-clouds.png',
+        ids:[801]
+    },
+    {
+        url:'images/mist.png',
+        ids:[701,711,721, 731,741, 751,761,771,781]
+    },
+    {
+        url:'images/rain.png',
+        ids:[500,501,502,503,504]
+    },
+    {
+        url:'images/scattered-clouds.png',
+        ids:[802]
+    },
+    {
+        url:'images/shower-rain.png',
+        ids:[520,521,522,531,300,301,302,310,311,312,313,314,321]
+    },
+    {
+        url:'images/snow.png',
+        ids:[511,600,601,602,611,612,613,615,616,620,621,622]
+    },
+    {
+        url:'images/thunderstorm.png',
+        ids:[200,201,202,210,211,212,221,230,231,232]
+    }
+]
+const getWeatherByCityName = async (city) => {
 
-const getWeatherByCityName=async (city)=>{
+    let endPoint = weatherBaseEndPoint + '&q=' + city;
 
-    let endPoint=weatherBaseEndPoint+'&q='+ city;
+    let response = await fetch(endPoint)
+    let weather = await response.json();
 
-    let response=await fetch(endPoint)
-    let weather=await response.json();
+    return weather;
 
-     return weather;
-  
 
 }
 
-const getForecatByCityID=async(id)=>{
+const getForecatByCityID = async (id) => {
 
-    let endPoint=forecastBaseEndpoint + '&id=' + id;
-    let result= await fetch (endPoint)
-    let forecast= await result.json();
+    let endPoint = forecastBaseEndpoint + '&id=' + id;
+    let result = await fetch(endPoint)
+    let forecast = await result.json();
 
-    let forecastList=forecast.list;
-    let daily=[];
-    forecastList.forEach(day=>{
-        let date= new Date(day.dt_txt.replace(' ', 'T'));
-        let hours=date.getHours();
-        if (hours===12){
+    let forecastList = forecast.list;
+    let daily = [];
+    forecastList.forEach(day => {
+        let date = new Date(day.dt_txt.replace(' ', 'T'));
+        let hours = date.getHours();
+        if (hours === 12) {
             daily.push(day)
         }
     })
 
-    console.log(daily)
+  return daily;
 }
-searchInp.addEventListener('keydown', async(e)=>{
+searchInp.addEventListener('keydown', async (e) => {
     //13 is the key enter key code
-    if (e.keyCode===13){
-        let weather=await getWeatherByCityName(searchInp.value)
-        let cityID=weather.id
+    if (e.keyCode === 13) {
+        let weather = await getWeatherByCityName(searchInp.value)
+        let cityID = weather.id
         updateCurrentWeather(weather)
-        getForecatByCityID(cityID)
-        
+        let forecast= await getForecatByCityID(cityID)
+
+        updateForecast(forecast)
+
     }
 })
 
-const updateCurrentWeather=(data)=>{
+const updateCurrentWeather = (data) => {
 
-    city.textContent=data.name + ', ' + data.sys.country;
-    day.textContent=dayOfWeek();
-    humidity.textContent=data.main.humidity;
-    pressure.textContent=data.main.pressure;
+    city.textContent = data.name + ', ' + data.sys.country;
+    day.textContent = dayOfWeek();
+    humidity.textContent = data.main.humidity;
+    pressure.textContent = data.main.pressure;
+  
     let windDirection;
-    let deg=data.wind.deg;
-    if (deg >45 && deg<=135){
-        windDirection='East'
-    } else if (deg >135 && deg <=225) {
-        windDirection='South'
-    } else if (deg >225 && deg <=135) {
-        windDirection='West'
-    } else{
-        windDirection='North'
+    let deg = data.wind.deg;
+    if (deg > 45 && deg <= 135) {
+        windDirection = 'East'
+    } else if (deg > 135 && deg <= 225) {
+        windDirection = 'South'
+    } else if (deg > 225 && deg <= 135) {
+        windDirection = 'West'
+    } else {
+        windDirection = 'North'
     }
-    
-    wind.textContent=windDirection + ', ' +  data.wind.speed
-    temprature.textContent=data.main.temp > 0 ? '+' + Math.round(data.main.temp) + '°C'
-                            : Math.round(data.main.temp) + '°C';
-   
+
+    wind.textContent = windDirection + ', ' + data.wind.speed
+    temprature.textContent = data.main.temp > 0 ? '+' + Math.round(data.main.temp) + '°C'
+        : Math.round(data.main.temp) + '°C';
+
 }
 
-const updateForecast=(forecast)=>{
+const updateForecast = (forecast) => {
 
-    forecastBlock.innerHTML='';
-    forecast.forEach(day=>{
+    forecastBlock.innerHTML = '';
+    forecast.forEach(day => {
 
-        let iconUrl='http://openweathermap.org/img/wn/' + day.weather[0].icon + '2x.png'
-        let day= dayOfWeek(day.dt * 1000);
-        
+        let iconUrl = 'http://openweathermap.org/img/wn/' + day.weather[0].icon + '@2x.png'
+        let dayName = dayOfWeek(day.dt * 1000);
+        let temprature = day.main.temp > 0 ? '+' + Math.round(day.main.temp)
+            : Math.round(day.main.temp);
+
+        let forecastItem = `
+            <article class="weather_forecast_item">
+                <img src="${iconUrl}" alt="${day.weather[0].description}" class="weather_forecast_icon">
+                <h3 class="weather_forecast_day">${dayName}</h3>
+                <p class="weather_forecast_temprature"><span class="value">${temprature}</span>&deg;C</p>
+            </article>
+            `
+            forecastBlock.insertAdjacentHTML('beforeend', forecastItem)
     })
 }
 
-const dayOfWeek=(dt= new Date().getTime())=>{
+const dayOfWeek = (dt = new Date().getTime()) => {
 
-    return new Date(dt).toLocaleDateString('en-EN', {'weekday': 'long'})
+    return new Date(dt).toLocaleDateString('en-EN', { 'weekday': 'long' })
 }
 
