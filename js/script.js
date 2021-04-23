@@ -92,10 +92,8 @@ const getForecatByCityID = async (id) => {
 
   return daily;
 }
-searchInp.addEventListener('keydown', async (e) => {
-    //13 is the key enter key code
-    if (e.keyCode === 13) {
-        let weather = await getWeatherByCityName(searchInp.value);
+const weatherForCity=async(city)=>{
+    let weather = await getWeatherByCityName(city);
         if (!weather){
             return;
         }
@@ -104,6 +102,19 @@ searchInp.addEventListener('keydown', async (e) => {
         let forecast= await getForecatByCityID(cityID)
 
         updateForecast(forecast)
+
+}
+//show default city
+const init=()=>{
+   
+    weatherForCity('Toronto').then(()=>document.body.style.filter='blur(0)')
+
+}
+init()
+searchInp.addEventListener('keydown', async (e) => {
+    //13 is the key enter key code
+    if (e.keyCode === 13) {
+        weatherForCity(searchInp.value)
 
     }
 })
