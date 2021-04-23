@@ -24,7 +24,7 @@ let getWeatherByCityName=async (city)=>{
 
 }
 searchInp.addEventListener('keydown', async(e)=>{
-
+    //13 is the key enter key code
     if (e.keyCode===13){
         let weather=await getWeatherByCityName(searchInp.value)
 
@@ -52,8 +52,8 @@ let updateCurrentWeather=(data)=>{
     }
     
     wind.textContent=windDirection + ', ' +  data.wind.speed
-    temprature.textContent=data.main.temp > 0 ? '+' + Math.round(data.main.temp)
-                            :Math.round(data.main.temp);
+    temprature.textContent=data.main.temp > 0 ? '+' + Math.round(data.main.temp) + '°C'
+                            : Math.round(data.main.temp) + '°C';
    
 }
 
