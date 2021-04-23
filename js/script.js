@@ -116,6 +116,14 @@ const updateCurrentWeather = (data) => {
     temprature.textContent = data.main.temp > 0 ? '+' + Math.round(data.main.temp) + '°C'
         : Math.round(data.main.temp) + '°C';
 
+    let imgId=data.weather[0].id;
+
+    weatherImages.forEach(obj=>{
+        if (obj.ids.includes(imgId)){
+            image.src=obj.url;
+        }
+    })
+
 }
 
 const updateForecast = (forecast) => {
