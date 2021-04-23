@@ -9,10 +9,11 @@ let temprature=document.querySelector('.weather_temprature')
 
 
 let weatherAPIKey='d4c3a8aefba09b7cf93c189487b1d070';
+let forecastBaseEndpoint='https://api.openweathermap.org/data/2.5/forecast?units=metric&appid=' + weatherAPIKey;
 let weatherBaseEndPoint='https://api.openweathermap.org/data/2.5/weather?units=metric&appid=' + weatherAPIKey;
 
 
-let getWeatherByCityName=async (city)=>{
+const getWeatherByCityName=async (city)=>{
 
     let endPoint=weatherBaseEndPoint+'&q='+ city;
 
@@ -23,17 +24,27 @@ let getWeatherByCityName=async (city)=>{
   
 
 }
+
+const getForecatByCityID=async(id)=>{
+
+    let endPoint=forecastBaseEndpoint + '&id=' + id;
+    let result= await fetch (endPoint)
+    let forecast= await result.json();
+
+    console.log(forecast)
+}
 searchInp.addEventListener('keydown', async(e)=>{
     //13 is the key enter key code
     if (e.keyCode===13){
         let weather=await getWeatherByCityName(searchInp.value)
-
+        let cityID=weather.id
         updateCurrentWeather(weather)
-        console.log(weather)
+        getForecatByCityID(cityID)
+        
     }
 })
 
-let updateCurrentWeather=(data)=>{
+const updateCurrentWeather=(data)=>{
 
     city.textContent=data.name + ', ' + data.sys.country;
     day.textContent=dayOfWeek();
@@ -57,7 +68,7 @@ let updateCurrentWeather=(data)=>{
    
 }
 
-let dayOfWeek=()=>{
+const dayOfWeek=()=>{
 
     return new Date().toLocaleDateString('en-EN', {'weekday': 'long'})
 }
